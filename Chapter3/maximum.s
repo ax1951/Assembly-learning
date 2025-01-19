@@ -39,4 +39,8 @@ loop_exit:
 # %ebx is the status code for the exit system call
 # and it already has the maximum number
     movl $1, %eax                   #1 is the exit() syscall
+    # leave off below line will trigger a segment fault.
     int $0x80
+
+# if you used movl instruction and didn't interrupt (terminate) the program, it will trigger a segmentation fault error.
+# https://stackoverflow.com/questions/21148523/segmentation-fault-when-not-interrupting-in-assembly
