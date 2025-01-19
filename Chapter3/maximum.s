@@ -12,8 +12,10 @@
 
 data_items:
     .long 3,67,34,222,45,75,54,34,44,33,22,11,66
-length:
-    .long 13
+# Use an ending address to indicate the end of the data items
+# https://stackoverflow.com/questions/68463932/how-to-compare-addresses-in-x86-using-the-end-pointer-of-a-static-array-as-a-lo
+data_end:
+
 
 .section .text
 
@@ -22,12 +24,13 @@ _start:
     movl $0, %edi                   # move 0 into the index register
     movl data_items(,%edi,4), %eax  # load the first byte of data
     movl %eax, %ebx                 # since this is the first item, %eax is the biggest
-    movl length, %ecx
+    movl $data_items, %ecx
 
 start_loop:
-    cmpl %edi, %ecx                   # check to see if we've hit the end
+    cmpl $data_end, %ecx            # check to see if we've hit the end
     je loop_exit
     incl %edi                       # load next value
+    addl $4, %ecx
     movl data_items(,%edi,4), %eax
     cmpl %ebx, %eax                 # compare values
     jle start_loop                  # jump to loop beginning if the new one isn't bigger
