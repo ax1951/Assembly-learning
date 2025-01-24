@@ -1,9 +1,8 @@
 #PURPOSE: Program to illustrate how functions work 
-#This program will compute the value of 2^3 + 5^2
+#This program will compute the value of 2^3 + 5^2 + 4^3
 
 #Everything in the main program is stored in registers, 
 #so the data section doesn’t have anything.
-
 .section .data
 
 .section .text
@@ -27,6 +26,15 @@ _start:
                      #so now we can just pop it out into %ebx
 
     addl %eax, %ebx  #add them together, the result is in %ebx
+
+    pushl %ebx
+    pushl $3
+    pushl $4
+    call power
+    addl $8, %esp
+
+    popl %ebx
+    addl %eax, %ebx
 
     movl $1, %eax    #exit (%ebx is returned)
     int $0x80
@@ -54,13 +62,13 @@ power:
     movl %esp, %ebp      #make stack pointer the base pointer
     subl $4, %esp        #get room for our lcoal storage
 
-    movl 8(%ebp), %ebx   #put first argument in %eax
+    movl 8(%ebp), %ebx   #put first argument in %ebx
     movl 12(%ebp), %ecx  #put second argument in %ecx
 
     movl %ebx, -4(%ebp)  #store current result
 
 power_loop_start:
-    cmpl $1, %ecx        $if the power is 1, we are done
+    cmpl $1, %ecx        #$if the power is 1, we are done
     je   end_power
 
     movl -4(%ebp), %eax  #move the current into %eax
@@ -76,4 +84,5 @@ end_power:
     popl %ebp            #restore the base pointer
     ret
 
-
+# assemble: as power.s -o power.o --32
+# link: ld power.o -o power -m elf_i386
