@@ -1,5 +1,5 @@
 #PURPOSE: Program to illustrate how functions work 
-#This program will compute the value of 2^3 + 5^2 + 4^3
+#This program will compute the value of 2^0 + 5^2 + 4^3
 
 #Everything in the main program is stored in registers, 
 #so the data section doesn’t have anything.
@@ -9,7 +9,7 @@
 
 .globl _start
 _start:
-    pushl $3         #push second argument
+    pushl $0         #push second argument
     pushl $2         #push first argument
     call power       #call the function
     addl $8, %esp    #move the stack pointer back
@@ -66,6 +66,12 @@ power:
     movl 12(%ebp), %ecx  #put second argument in %ecx
 
     movl %ebx, -4(%ebp)  #store current result
+
+    cmp $0, %ecx
+    jne power_loop_start
+
+    movl $1, -4(%ebp)    #if %ecx is 0, return 1
+    jmp end_power
 
 power_loop_start:
     cmpl $1, %ecx        #$if the power is 1, we are done
