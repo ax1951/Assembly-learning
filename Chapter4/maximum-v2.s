@@ -6,19 +6,30 @@
 
 .section .data
 
-data_items:
+data_items1:
     .long 3,67,34,27,45,75,54,34,44,33,22,11,0
+
+data_items2:
+    .long 24,91,1,18,57,33,26,99,0
+
+data_items3:
+    .long 61,3,9,7,25,34,40,0
 
 .section .text
 
 .type findMaximum, @function
 .globl _start
 _start:
-    movl $data_items, %ecx                 # since this is the first item, %eax is the biggest
+    movl $data_items1, %ecx
     call findMaximum
 
-    movl $1, %eax                   #1 is the exit() syscall
-    # leave off below line will trigger a segment fault.
+    movl $data_items2, %ecx
+    call findMaximum
+
+    movl $data_items3, %ecx
+    call findMaximum
+
+    movl $1, %eax        #1 is the exit() syscall
     int $0x80
 
 # return maximum value in %ebx
