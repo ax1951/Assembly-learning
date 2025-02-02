@@ -44,8 +44,10 @@
 #         the output file. This shouldn never exceed
 #         16,000 for various reasons.
 #
-.equ BUFFER_SIZE, 5
+.equ BUFFER_SIZE, 500
 .lcomm BUFFER_DATA, BUFFER_SIZE
+.equ FD_SIZE, 8
+.lcomm FD_BUFFER, FD_SIZE
 
 .section .text
 
@@ -71,10 +73,6 @@ _start:
     #save the stack pointer
     movl %esp, %ebp
 
-    #Allocate space for our file descriptors
-    #on the stack
-    subl $ST_SIZE_RESERVE, %esp
-
 open_files:
 open_fd_in:
     ###OPEN INPUT FILE###
@@ -91,7 +89,8 @@ open_fd_in:
 
 store_fd_in:
     #save the given file descriptor
-    movl %eax, ST_FD_IN(%ebp)
+    movl $FD_BUFFER, %edi
+    movl %eax, (%edi)
 
 open_fd_out:
     ###OPEN OUTPUT FILE###
@@ -108,13 +107,15 @@ open_fd_out:
 
 store_fd_out:
     #store the file descriptor here
-    movl %eax, ST_FD_OUT(%ebp)
+    movl $FD_BUFFER, %edi
+    movl %eax, 4(%edi)
 
 read_loop_begin:
     ###READ IN A BLOCK FROM THE INPUT FILE###
     movl $SYS_READ, %eax
     #get the input file descriptor
-    movl ST_FD_IN(%ebp), %ebx
+    movl $FD_BUFFER, %edi
+    movl (%edi), %ebx
     #the location to read into
     movl $BUFFER_DATA, %ecx
     #the size of the buffer
@@ -141,7 +142,8 @@ continue_read_loop:
     movl %eax, %edx
     movl $SYS_WRITE, %eax
     #file to use
-    movl ST_FD_OUT(%ebp), %ebx
+    movl $FD_BUFFER, %edi
+    movl 4(%edi), %ebx
     #location of the buffer
     movl $BUFFER_DATA, %ecx
     int $LINUX_SYSCALL
@@ -155,11 +157,13 @@ end_loop:
     #       on these, because error conditions
     #       don't signify anything special here
     movl $SYS_CLOSE, %eax
-    movl ST_FD_OUT(%ebp), %ebx
+    movl $FD_BUFFER, %edi
+    movl 4(%edi), %ebx
     int $LINUX_SYSCALL
 
     movl $SYS_CLOSE, %eax
-    movl ST_FD_IN(%ebp), %ebx
+    movl $FD_BUFFER, %edi
+    movl (%edi), %ebx
     int $LINUX_SYSCALL
 
     ###EXIT###
