@@ -24,7 +24,7 @@
 #This is discussed at greater length in
 #"Counting Like a Computer"
 .equ O_RDONLY, 0
-.equ O_CREATE_WRONLY_TRUNC, 03101
+.equ O_CREATE_WRONLY_TRUNC, 01101
 
 #standard file descriptors
 .equ STDIN, 0
