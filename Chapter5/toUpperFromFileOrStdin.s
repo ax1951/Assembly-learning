@@ -10,6 +10,10 @@
 #                c. write the memory buffer to output file
 #
 .section .data
+error_msg:
+    .ascii "An error occurred, check program exit status for error code.\n\0"
+error_msg_end:
+
 ##########CONSTANTS##########
 #system call numbers
 .equ SYS_EXIT, 1
@@ -144,6 +148,9 @@ read_loop_begin:
     #Size of the buffer read is returned in %eax
     int $LINUX_SYSCALL
 
+    cmpl $0, %eax
+    jl error
+
     ###EXIT IF WE'VE REACHED THE END###
     #check for end of file marker
     cmpl $END_OF_FILE, %eax
@@ -169,6 +176,9 @@ continue_read_loop:
     movl $BUFFER_DATA, %ecx
     int $LINUX_SYSCALL
 
+    cmpl $0, %eax
+    jl error
+
     ###CONTINUE THE LOOP###
     jmp read_loop_begin
 
@@ -182,10 +192,16 @@ end_loop:
     movl 4(%edi), %ebx
     int $LINUX_SYSCALL
 
+    cmpl $0, %eax
+    jl error
+
     movl $SYS_CLOSE, %eax
     movl $FD_BUFFER, %edi
     movl (%edi), %ebx
     int $LINUX_SYSCALL
+
+    cmpl $0, %eax
+    jl error
 
     ###EXIT###
     movl $SYS_EXIT, %eax
@@ -195,6 +211,17 @@ end_loop:
 error:
     negl %eax                # %eax contains -errno, to get errno
                              # we need to negate it
+    pushl %eax
+
+    # print error message
+    movl $SYS_WRITE, %eax
+    movl $STDOUT, %ebx
+    movl $error_msg, %ecx
+    movl $error_msg_end, %edx
+    subl %ecx, %edx
+    int $LINUX_SYSCALL
+
+    popl %eax
     movl %eax, %ebx          
     movl $SYS_EXIT, %eax
     int $LINUX_SYSCALL
