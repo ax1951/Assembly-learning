@@ -31,6 +31,11 @@ record1:
 
     .long 45
 
+    .ascii "Scrum master\0"
+    .rept 27
+    .byte 0
+    .endr
+
 record2:
     .ascii "Marilyn\0"
     .rept 32 #Padding to 40 bytes
@@ -49,6 +54,11 @@ record2:
 
     .long 29
 
+    .ascii "Principal software engineer\0"
+    .rept 12
+    .byte 0
+    .endr
+
 record3:
     .ascii "Derrick\0"
     .rept 32 #Padding to 40 bytes
@@ -66,6 +76,11 @@ record3:
     .endr
 
     .long 36
+
+    .ascii "Senior software engineer\0"
+    .rept  15
+    .byte 0
+    .endr
 
 #This is the name of the file we will write to
 file_name:
