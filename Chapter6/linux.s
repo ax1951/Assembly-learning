@@ -6,6 +6,7 @@
 .equ SYS_WRITE, 4
 .equ SYS_OPEN, 5
 .equ SYS_CLOSE, 6
+.equ SYS_LSEEK, 19
 .equ SYS_BRK, 45
 
 #System Call Interrupt Number
@@ -18,3 +19,16 @@
 
 #Common Status Codes
 .equ END_OF_FILE, 0
+
+#Open file mode
+.equ O_RDONLY,     0
+.equ O_WRONLY,     1
+.equ O_RDWR,       2
+.equ O_CREAT,   0100
+.equ O_TRUNC,  01000
+.equ O_APPEND, 02000
+
+#lseek whence
+.equ SEEK_SET, 0 
+.equ SEEK_CUR, 1
+.equ SEEK_END, 2
