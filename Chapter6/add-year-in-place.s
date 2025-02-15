@@ -52,11 +52,13 @@ loop_begin:
     movl $SYS_LSEEK, %eax
     movl ST_IN_OUT_DESCRIPTOR(%ebp), %ebx
     movl ST_WRITE_POSITION(%ebp), %ecx
+    #Uncomment below line to trigger an error
+    #movl $-1, %ecx
     movl $SEEK_SET, %edx
     int $LINUX_SYSCALL
 
-    cmpl $-1, %eax
-    je error_handling
+    cmpl $0, %eax
+    jl error_handling
 
     #Write the record out
     pushl ST_IN_OUT_DESCRIPTOR(%ebp)
@@ -73,12 +75,25 @@ loop_begin:
     movl $SEEK_SET, %edx
     int $LINUX_SYSCALL
 
+    cmpl $0, %eax
+    jl error_handling
+
     jmp loop_begin
 
 error_handling:
+    #store errno
+    pushl %eax
+
     pushl $lseek_error_msg
+    pushl $STDERR
     call write_message
-    addl $4, %esp
+    addl $8, %esp
+
+    popl %eax
+    negl %eax
+    movl %eax, %ebx
+    movl $SYS_EXIT, %eax
+    int $LINUX_SYSCALL
 
 loop_end:
     movl $SYS_EXIT, %eax
