@@ -3,7 +3,7 @@
 #PURPOSE: This function writes a record to
 #         the given file descriptor
 #
-#INPUT:   The file descriptor and a buffer
+#INPUT:   The buffer and file descriptor
 #
 #OUTPUT:  This function produces a status code
 #
@@ -12,10 +12,10 @@
 .equ ST_FILEDES, 12
 
 # stack info
-# %ebp
+# %ebp               #Low address
 # return address
 # buffer address
-# file descriptor
+# file descriptor    #High address
 
 .section .text
 .globl write_record
